@@ -6,16 +6,13 @@
 #ifndef CO2_h
 #define CO2_h
 
-#include <SoftwareSerial.h>
+#include <s8_uart.h>
 #include "QualitySensor.h"
 
-#ifdef ESP8266
-  #define PIN_CO2_RX D3
-  #define PIN_CO2_TX D4
-#endif
-#ifdef ESP32
-  #define PIN_CO2_RX 25
-  #define PIN_CO2_TX 26
+#ifdef ARDUINO_LOLIN_S2_MINI
+  #include <HardwareSerial.h>
+  #define PIN_CO2_RX 18
+  #define PIN_CO2_TX 16
 #endif
 
 
@@ -26,12 +23,16 @@ struct CO2_READ_RESULT {
 
 class CO2: public QualitySensor {
 public:
-    void Init(int rx_pin = PIN_CO2_TX, int tx_pin = PIN_CO2_RX, int baud = 9600);
-    String read() override;
-    int getCO2_Raw();
-    SoftwareSerial *_SoftSerial_CO2;
+    void Init(int rx_pin = PIN_CO2_TX, int tx_pin = PIN_CO2_RX);
+    void read() override;
+    const char* data() override;
+    const char* AQI() override;
 private:
-    char Char_CO2[10];
+    int getCO2_Raw();
+    Stream *_serial;
+    S8_UART * _sensor_S8;
+    char _data[10];
+    char _AQI[10];
 };
 
 #endif
